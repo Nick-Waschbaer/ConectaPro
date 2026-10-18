@@ -43,15 +43,13 @@ export default function App() {
 
   return (
     <>
-      <header className="hero">
+      <header className="band">
         <div className="container">
           <p className="brand">
             <span className="brand-mark" aria-hidden="true">C</span> ConectaPro
           </p>
-          <h1>Encontrá al profesional ideal para tu hogar</h1>
-          <p className="hero-sub">
-            Electricistas, plomeros, pintores y más en Asunción. Elegí un oficio y pedí tu servicio en un minuto.
-          </p>
+          <h1>Profesionales del hogar en Asunción</h1>
+          <ServiceFilter services={services} value={service} onChange={setService} disabled={loading} />
         </div>
       </header>
 
@@ -65,22 +63,20 @@ export default function App() {
       )}
 
       <main className="container">
-        <ServiceFilter services={services} value={service} onChange={setService} disabled={loading} />
-
         <div aria-live="polite">
           {loading && (
-            <section className="grid" aria-label="Cargando profesionales" aria-busy="true">
+            <ul className="list" aria-label="Cargando profesionales" aria-busy="true">
               {[1, 2, 3].map((n) => (
-                <div className="card skeleton" key={n} aria-hidden="true" />
+                <li className="pro skeleton" key={n} aria-hidden="true" />
               ))}
-            </section>
+            </ul>
           )}
 
           {!loading && error && (
             <div className="state state-error" role="alert">
               <h2>No pudimos cargar los profesionales</h2>
               <p>{error}</p>
-              <button type="button" className="btn" onClick={() => setReloadKey((k) => k + 1)}>
+              <button type="button" className="btn btn-primary" onClick={() => setReloadKey((k) => k + 1)}>
                 Reintentar
               </button>
             </div>
@@ -104,11 +100,18 @@ export default function App() {
                 {list.length} {list.length === 1 ? 'profesional' : 'profesionales'}
                 {service && ` de ${service}`}
               </p>
-              <section className="grid" aria-label="Profesionales">
+              <div className="list-head" aria-hidden="true">
+                <span>Profesional</span>
+                <span>Oficio</span>
+                <span>Barrio</span>
+                <span>Valoración</span>
+                <span />
+              </div>
+              <ul className="list" aria-label="Profesionales">
                 {list.map((p) => (
                   <ProfessionalCard key={p.id} professional={p} onRequest={setSelected} />
                 ))}
-              </section>
+              </ul>
             </>
           )}
         </div>

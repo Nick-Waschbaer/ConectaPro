@@ -151,7 +151,7 @@ export default function RequestForm({ professional, onClose }) {
                 <p className="muted">Número de solicitud: #{success.data.id}</p>
               </>
             )}
-            <button type="button" className="btn" onClick={onClose} autoFocus>
+            <button type="button" className="btn btn-primary" onClick={onClose} autoFocus>
               Listo
             </button>
           </div>
@@ -213,7 +213,7 @@ export default function RequestForm({ professional, onClose }) {
               <button type="button" className="btn btn-secondary" onClick={onClose} disabled={sending}>
                 Cancelar
               </button>
-              <button type="submit" className="btn" disabled={sending}>
+              <button type="submit" className="btn btn-primary" disabled={sending}>
                 {sending ? 'Enviando…' : 'Enviar solicitud'}
               </button>
             </div>

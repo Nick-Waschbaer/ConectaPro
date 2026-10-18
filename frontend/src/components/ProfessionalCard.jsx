@@ -1,38 +1,42 @@
-// Iniciales para el avatar: se ignora lo que va entre paréntesis, por ejemplo "(demo)".
-function initials(name) {
-  return name
-    .replace(/\(.*?\)/g, '')
-    .trim()
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((word) => word[0]?.toUpperCase() || '')
-    .join('')
-}
-
+// Una fila del listado. En escritorio los datos se alinean en columnas (ver index.css);
+// en móvil se apilan y cada dato muestra su etiqueta.
 export default function ProfessionalCard({ professional, onRequest }) {
   const { name, service, description, neighborhood, rating } = professional
+  const hasRating = rating != null
+
   return (
-    <article className="card">
-      <div className="card-top">
-        <div className="avatar" aria-hidden="true">
-          {initials(name)}
-        </div>
-        <div>
-          <h3>{name}</h3>
-          <span className="badge">{service}</span>
-        </div>
+    <li className="pro">
+      <div className="pro-main">
+        <h3>{name}</h3>
+        {description && <p>{description}</p>}
       </div>
 
-      {description && <p className="card-desc">{description}</p>}
+      <dl className="pro-facts">
+        <div>
+          <dt>Oficio</dt>
+          <dd>{service}</dd>
+        </div>
+        <div>
+          <dt>Barrio</dt>
+          <dd>{neighborhood || 'Sin dato'}</dd>
+        </div>
+        <div>
+          <dt>Valoración</dt>
+          <dd className="rating" aria-label={hasRating ? `${Number(rating).toFixed(1)} de 5` : 'Sin valoración'}>
+            {hasRating ? (
+              <>
+                <span className="star" aria-hidden="true">★</span> {Number(rating).toFixed(1)}
+              </>
+            ) : (
+              'Sin dato'
+            )}
+          </dd>
+        </div>
+      </dl>
 
-      <ul className="meta">
-        {neighborhood && <li>📍 {neighborhood}</li>}
-        {rating != null && <li aria-label={`Calificación ${Number(rating).toFixed(1)} de 5`}>★ {Number(rating).toFixed(1)}</li>}
-      </ul>
-
-      <button type="button" className="btn btn-block" onClick={() => onRequest(professional)}>
+      <button type="button" className="btn btn-outline pro-action" onClick={() => onRequest(professional)}>
         Solicitar servicio
       </button>
-    </article>
+    </li>
   )
 }
