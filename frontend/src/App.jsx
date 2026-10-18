@@ -5,70 +5,111 @@ import ProfessionalCard from './components/ProfessionalCard'
 import RequestForm from './components/RequestForm'
 
 export default function App() {
-  const [professionals, setProfessionals] = useState([])
-  const [services, setServices] = useState([]) // oficios conocidos, para el desplegable
-  const [service, setService] = useState('')
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
-  const [reloadKey, setReloadKey] = useState(0)
-  const [selected, setSelected] = useState(null)
+  const [service, setService] = useState('') // oficio elegido ('' = todos)
+  const [reloadKey, setReloadKey] = useState(0) // sube cuando se pulsa "Reintentar"
+  const [services, setServices] = useState([]) // oficios vistos, para los botones del filtro
+  const [selected, setSelected] = useState(null) // profesional elegido para el formulario
+  // Guardamos el resultado junto con la petición a la que pertenece (key).
+  const [result, setResult] = useState({ key: null, list: [], error: '' })
 
-  // Cada vez que cambia el filtro (o se pulsa "Reintentar") se pide la lista a la API.
+  const requestKey = `${service}|${reloadKey}`
+  // Está cargando mientras el resultado guardado no corresponda a la petición actual.
+  const loading = result.key !== requestKey
+
   useEffect(() => {
+    const controller = new AbortController()
     let cancelled = false
-    setLoading(true)
-    setError('')
-    getProfessionals(service)
-      .then((data) => {
+
+    getProfessionals(service, controller.signal)
+      .then((list) => {
         if (cancelled) return
-        const list = Array.isArray(data) ? data : data?.data || []
-        setProfessionals(list)
-        // Se acumulan los oficios vistos para que el desplegable no se vacíe al filtrar.
+        setResult({ key: requestKey, list, error: '' })
+        // Se acumulan los oficios para que los botones no desaparezcan al filtrar.
         setServices((prev) => [...new Set([...prev, ...list.map((p) => p.service)])].sort())
       })
-      .catch((err) => !cancelled && setError(err.message))
-      .finally(() => !cancelled && setLoading(false))
+      .catch((err) => {
+        if (!cancelled) setResult({ key: requestKey, list: [], error: err.message })
+      })
+
+    // Si cambia el filtro antes de terminar, se descarta la petición anterior.
     return () => {
       cancelled = true
+      controller.abort()
     }
-  }, [service, reloadKey])
+  }, [service, requestKey])
+
+  const { list, error } = result
 
   return (
     <>
       <header className="hero">
         <div className="container">
-          <h1>ConectaPro</h1>
-          <p>Encuentra profesionales de confianza para tu hogar en Asunción.</p>
-          <p className="demo-note">Demo escolar: profesionales y datos ficticios.</p>
+          <p className="brand">
+            <span className="brand-mark" aria-hidden="true">C</span> ConectaPro
+          </p>
+          <h1>Encontrá al profesional ideal para tu hogar</h1>
+          <p className="hero-sub">
+            Electricistas, plomeros, pintores y más en Asunción. Elegí un oficio y pedí tu servicio en un minuto.
+          </p>
         </div>
       </header>
 
       <main className="container">
-        <ServiceFilter services={services} value={service} onChange={setService} />
+        <ServiceFilter services={services} value={service} onChange={setService} disabled={loading} />
 
-        {loading && <p className="status" role="status">Cargando profesionales…</p>}
+        <div aria-live="polite">
+          {loading && (
+            <section className="grid" aria-label="Cargando profesionales" aria-busy="true">
+              {[1, 2, 3].map((n) => (
+                <div className="card skeleton" key={n} aria-hidden="true" />
+              ))}
+            </section>
+          )}
 
-        {!loading && error && (
-          <div className="alert" role="alert">
-            <p>{error}</p>
-            <button className="btn btn-secondary" onClick={() => setReloadKey((k) => k + 1)}>
-              Reintentar
-            </button>
-          </div>
-        )}
+          {!loading && error && (
+            <div className="state state-error" role="alert">
+              <h2>No pudimos cargar los profesionales</h2>
+              <p>{error}</p>
+              <button type="button" className="btn" onClick={() => setReloadKey((k) => k + 1)}>
+                Reintentar
+              </button>
+            </div>
+          )}
 
-        {!loading && !error && professionals.length === 0 && (
-          <p className="status">No encontramos profesionales para este oficio.</p>
-        )}
+          {!loading && !error && list.length === 0 && (
+            <div className="state">
+              <h2>{service ? `No hay profesionales de ${service} por ahora` : 'Todavía no hay profesionales'}</h2>
+              <p>{service ? 'Probá con otro oficio.' : 'Volvé a intentar más tarde.'}</p>
+              {service && (
+                <button type="button" className="btn btn-secondary" onClick={() => setService('')}>
+                  Ver todos
+                </button>
+              )}
+            </div>
+          )}
 
-        {!loading && !error && professionals.length > 0 && (
-          <section className="grid" aria-label="Profesionales">
-            {professionals.map((p) => (
-              <ProfessionalCard key={p.id} professional={p} onRequest={setSelected} />
-            ))}
-          </section>
-        )}
+          {!loading && !error && list.length > 0 && (
+            <>
+              <p className="count">
+                {list.length} {list.length === 1 ? 'profesional' : 'profesionales'}
+                {service && ` de ${service}`}
+              </p>
+              <section className="grid" aria-label="Profesionales">
+                {list.map((p) => (
+                  <ProfessionalCard key={p.id} professional={p} onRequest={setSelected} />
+                ))}
+              </section>
+            </>
+          )}
+        </div>
       </main>
+
+      <footer className="footer">
+        <div className="container">
+          Proyecto escolar de demostración. Los profesionales y las solicitudes son de prueba; no hay pagos ni
+          verificación de identidad.
+        </div>
+      </footer>
 
       {selected && <RequestForm professional={selected} onClose={() => setSelected(null)} />}
     </>
