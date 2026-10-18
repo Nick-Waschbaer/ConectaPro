@@ -48,19 +48,43 @@ export default function RequestForm({ professional, onClose }) {
   const dialogRef = useRef(null)
 
   // Al abrir: bloquea el scroll del fondo y enfoca el primer campo.
+  // Al cerrar: el foco vuelve al botón que abrió el formulario.
   useEffect(() => {
+    const opener = document.activeElement
     const previous = document.body.style.overflow
     document.body.style.overflow = 'hidden'
     dialogRef.current?.querySelector('input, textarea')?.focus()
     return () => {
       document.body.style.overflow = previous
+      if (opener instanceof HTMLElement) opener.focus()
     }
   }, [])
 
-  // Escape cierra el formulario, salvo mientras se está enviando.
+  // Escape cierra el formulario (salvo mientras se envía). Tab se queda dentro de la ventana:
+  // al llegar al último control vuelve al primero, y al revés con Shift+Tab.
   useEffect(() => {
     function onKeyDown(e) {
       if (e.key === 'Escape' && !submittingRef.current) onClose()
+      if (e.key !== 'Tab' || !dialogRef.current) return
+
+      const focusable = dialogRef.current.querySelectorAll(
+        'button:not(:disabled), input:not(:disabled), textarea:not(:disabled), a[href]',
+      )
+      if (focusable.length === 0) {
+        e.preventDefault() // todo está deshabilitado (enviando): el foco no sale del diálogo
+        dialogRef.current.focus()
+        return
+      }
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      const inside = dialogRef.current.contains(document.activeElement)
+      if (e.shiftKey && (document.activeElement === first || !inside)) {
+        e.preventDefault()
+        last.focus()
+      } else if (!e.shiftKey && (document.activeElement === last || !inside)) {
+        e.preventDefault()
+        first.focus()
+      }
     }
     document.addEventListener('keydown', onKeyDown)
     return () => document.removeEventListener('keydown', onKeyDown)
@@ -127,7 +151,7 @@ export default function RequestForm({ professional, onClose }) {
         if (e.target === e.currentTarget && !sending) onClose()
       }}
     >
-      <div className="modal" role="dialog" aria-modal="true" aria-labelledby="form-title" ref={dialogRef}>
+      <div className="modal" role="dialog" aria-modal="true" aria-labelledby="form-title" tabIndex={-1} ref={dialogRef}>
         {success ? (
           <div className="success">
             <div className="success-icon" aria-hidden="true">✓</div>
