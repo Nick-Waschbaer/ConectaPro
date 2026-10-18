@@ -32,9 +32,24 @@ Leer primero:
 
 ## Desarrollo local
 
-Los comandos definitivos se documentarán aquí cuando se hayan confirmado las configuraciones de `frontend/` y `backend/`. Como referencia general:
+### Backend (`backend/`)
 
-- Frontend: instalar dependencias con `npm install` y ejecutar `npm run dev` dentro de `frontend/`.
-- Backend: instalar dependencias con `composer install`, preparar el `.env`, configurar MySQL, ejecutar `php artisan migrate` y arrancar Laravel con `php artisan serve` dentro de `backend/`.
+Requiere **PHP 8.4 o superior** (el PHP 8.2 de XAMPP no sirve) y MySQL encendido. Resumen:
+
+```bash
+cd backend
+composer install
+cp .env.example .env
+php artisan key:generate
+php artisan migrate --seed   # crea las tablas y carga profesionales ficticios
+php artisan serve            # API en http://127.0.0.1:8000/api
+php artisan test             # pruebas (usan SQLite en memoria, no tocan MySQL)
+```
+
+Los pasos completos (crear la base `conectapro`, CORS para Vercel, etc.) están en [`backend/README.md`](backend/README.md).
+
+### Frontend (`frontend/`)
+
+Pendiente de documentar por Nicolás. Como referencia general: `npm install` y `npm run dev` dentro de `frontend/`.
 
 No subir nunca archivos `.env`, contraseñas, claves API ni datos personales reales.
