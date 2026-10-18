@@ -26,44 +26,69 @@ h1, h2, h3, p, dl, dd, ul { margin: 0; padding: 0; }
 button, input, textarea { font: inherit; }
 .container { width: 100%; max-width: 1080px; margin: 0 auto; padding: 0 16px; }
 
-/* ---------- Franja superior: marca, título y filtro ---------- */
-.band { background: var(--primary); color: #fff; padding: 14px 0 18px; }
-.brand { display: flex; align-items: center; gap: 8px; font-weight: 700; }
+/* ---------- Barra superior ---------- */
+html { scroll-padding-top: 12px; }
+.topbar { background: var(--surface); border-bottom: 1px solid var(--line); }
+.topbar-inner { display: flex; align-items: center; justify-content: space-between; min-height: 56px; }
+.brand { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 1.05rem; }
 .brand-mark {
-  display: grid; place-items: center; width: 26px; height: 26px;
-  background: #fff; color: var(--primary); border-radius: var(--radius-sm); font-size: 0.95rem;
+  display: grid; place-items: center; width: 28px; height: 28px;
+  background: var(--primary); color: #fff; border-radius: var(--radius-sm); font-size: 0.95rem;
 }
-.band h1 { margin: 16px 0 14px; font-size: clamp(1.4rem, 4.5vw, 1.9rem); line-height: 1.2; font-weight: 700; letter-spacing: -0.01em; }
+.topbar nav { display: flex; gap: 4px; }
+.topbar nav a {
+  display: inline-flex; align-items: center; min-height: 44px; padding: 0 10px;
+  color: var(--text); font-weight: 500; text-decoration: none; border-radius: var(--radius-sm);
+}
+.topbar nav a:hover { color: var(--primary); }
+.topbar nav a:focus-visible { outline: 3px solid #93c5fd; outline-offset: 0; }
 
-/* Oficios: en móvil van en una sola fila que se desliza; en escritorio se acomodan en varias. */
-.chips {
-  display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none;
-  margin: 0 -16px; padding: 2px 16px;
+/* ---------- Franja con el título ---------- */
+.band { background: var(--primary); color: #fff; padding: 20px 0 52px; }
+.band h1 { font-size: clamp(1.5rem, 5vw, 2.1rem); line-height: 1.2; font-weight: 700; letter-spacing: -0.01em; }
+.band-sub { margin-top: 8px; color: #dbe7ff; }
+
+/* ---------- Panel de búsqueda (se superpone al borde de la franja) ---------- */
+.search {
+  position: relative; margin-top: -32px; display: grid; gap: 12px; padding: 16px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+  box-shadow: 0 1px 2px rgba(28, 37, 48, 0.08);
 }
-.chips::-webkit-scrollbar { display: none; }
-.chip {
-  flex: none; min-height: 40px; padding: 0 14px; cursor: pointer; font-weight: 500;
-  background: transparent; color: #fff; border: 1px solid rgba(255, 255, 255, 0.6); border-radius: var(--radius-sm);
+.search-field { display: grid; gap: 4px; }
+.search-field label { font-size: 0.85rem; font-weight: 600; }
+select {
+  width: 100%; min-height: 48px; padding: 0 12px; color: var(--text); background: #fff;
+  border: 1px solid var(--field); border-radius: var(--radius-sm);
 }
-.chip:hover:not(:disabled) { background: rgba(255, 255, 255, 0.14); }
-.chip[aria-pressed='true'] { background: #fff; color: var(--primary); border-color: #fff; font-weight: 700; }
-.chip:disabled { cursor: progress; opacity: 0.75; }
-.chip:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
-/* Señal de que hay más oficios a la derecha: el borde se desvanece. Mide igual que el relleno
-   derecho (16px), así que al llegar al final del deslizamiento no se atenúa ningún botón. */
-@media (max-width: 719px) {
-  .chips { mask-image: linear-gradient(to right, #000 calc(100% - 16px), transparent); }
+select:focus-visible { outline: 3px solid #93c5fd; outline-offset: 2px; }
+.search-submit { min-height: 48px; }
+@media (min-width: 760px) {
+  .search { grid-template-columns: 1.4fr 1fr auto; align-items: end; padding: 20px; gap: 16px; }
 }
-@media (min-width: 720px) {
-  .chips { flex-wrap: wrap; overflow: visible; margin: 0; padding: 0; }
+
+/* ---------- Oficios ---------- */
+.categories { margin-top: 28px; }
+.categories h2, .results h2 { font-size: 1.1rem; margin-bottom: 12px; }
+.category-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+.category {
+  display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; padding: 8px 12px;
+  background: var(--surface); color: var(--text); font-weight: 500; text-align: left; cursor: pointer;
+  border: 1px solid var(--line); border-radius: var(--radius-sm);
+}
+.category:hover { border-color: var(--primary); }
+.category[aria-pressed='true'] { border-color: var(--primary); background: var(--primary-tint); color: var(--primary-dark); font-weight: 700; }
+.category:focus-visible { outline: 3px solid #93c5fd; outline-offset: 2px; }
+.service-icon { flex: none; color: var(--primary); }
+@media (min-width: 600px) {
+  .category-grid { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
 }
 
 /* ---------- Aviso del modo demostración ---------- */
 .demo-banner { background: #fef3c7; color: #78350f; border-bottom: 1px solid #fcd34d; padding: 8px 0; font-size: 0.875rem; }
 .alert-demo { background: #fef3c7; border: 1px solid #fcd34d; color: #78350f; border-radius: var(--radius-sm); padding: 10px 12px; margin-top: 16px; font-size: 0.875rem; }
 
-main { padding-top: 20px; padding-bottom: 40px; min-height: 45vh; }
-.count { color: var(--muted); font-size: 0.9rem; margin-bottom: 10px; }
+main { padding-bottom: 40px; min-height: 45vh; }
+.results { margin-top: 28px; }
 
 /* ---------- Listado de profesionales ---------- */
 .list { list-style: none; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
@@ -139,6 +164,7 @@ main { padding-top: 20px; padding-bottom: 40px; min-height: 45vh; }
   .overlay { align-items: center; padding: 16px; }
   .modal { border-radius: var(--radius); padding: 24px; box-shadow: 0 8px 30px rgba(28, 37, 48, 0.25); }
 }
+.modal:focus { outline: none; } /* recibe el foco solo por código, cuando no hay otro control activo */
 .modal h2 { font-size: 1.25rem; }
 .muted { color: var(--muted); }
 .field { display: flex; flex-direction: column; gap: 4px; margin-top: 16px; }
