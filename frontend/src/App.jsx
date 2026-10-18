@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { USE_MOCK_API } from './config'
 import { getProfessionals } from './services/api'
 import ServiceFilter from './components/ServiceFilter'
 import ProfessionalCard from './components/ProfessionalCard'
@@ -53,6 +54,15 @@ export default function App() {
           </p>
         </div>
       </header>
+
+      {USE_MOCK_API && (
+        <div className="demo-banner" role="status">
+          <div className="container">
+            <strong>Modo demostración:</strong> estos profesionales son ficticios y las solicitudes no se guardan
+            en MySQL ni se envían a ningún profesional.
+          </div>
+        </div>
+      )}
 
       <main className="container">
         <ServiceFilter services={services} value={service} onChange={setService} disabled={loading} />

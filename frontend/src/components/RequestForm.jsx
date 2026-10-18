@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { USE_MOCK_API } from '../config'
 import { ApiError, createServiceRequest } from '../services/api'
 
 // Los límites copian las reglas de Laravel (StoreServiceRequestRequest).
@@ -130,12 +131,26 @@ export default function RequestForm({ professional, onClose }) {
         {success ? (
           <div className="success">
             <div className="success-icon" aria-hidden="true">✓</div>
-            <h2 id="form-title">¡Solicitud registrada!</h2>
-            <p>
-              Tu solicitud para <strong>{professional.name}</strong> quedó guardada
-              {success.data.status === 'pending' ? ' como pendiente' : ''}.
-            </p>
-            <p className="muted">Número de solicitud: #{success.data.id}</p>
+            {USE_MOCK_API ? (
+              <>
+                <h2 id="form-title">Simulación completada</h2>
+                <p>
+                  Así se vería la confirmación para <strong>{professional.name}</strong>.
+                </p>
+                <p className="alert-demo">
+                  Modo demostración: esta solicitud NO se guardó en MySQL ni se envió a ningún profesional.
+                </p>
+              </>
+            ) : (
+              <>
+                <h2 id="form-title">¡Solicitud registrada!</h2>
+                <p>
+                  Tu solicitud para <strong>{professional.name}</strong> quedó guardada
+                  {success.data.status === 'pending' ? ' como pendiente' : ''}.
+                </p>
+                <p className="muted">Número de solicitud: #{success.data.id}</p>
+              </>
+            )}
             <button type="button" className="btn" onClick={onClose} autoFocus>
               Listo
             </button>
@@ -146,6 +161,12 @@ export default function RequestForm({ professional, onClose }) {
             <p className="muted">
               {professional.name} · {professional.service}
             </p>
+
+            {USE_MOCK_API && (
+              <p className="alert-demo">
+                Modo demostración: al enviar, nada se guarda en MySQL ni llega a ningún profesional.
+              </p>
+            )}
 
             {error && (
               <p className="alert" role="alert">

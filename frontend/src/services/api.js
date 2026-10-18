@@ -1,15 +1,9 @@
-import { API_BASE_URL } from '../config'
+import { API_BASE_URL, USE_MOCK_API } from '../config'
+import * as mockApi from './mockApi'
+import { ApiError } from './apiError'
+import { UNEXPECTED, confirmCreatedRequest } from './contract'
 
-// Error propio para poder leer el estado HTTP y los errores por campo (422).
-export class ApiError extends Error {
-  constructor(message, { status = 0, fieldErrors = {} } = {}) {
-    super(message)
-    this.status = status
-    this.fieldErrors = fieldErrors
-  }
-}
-
-const UNEXPECTED = 'El servidor respondió algo inesperado. Avisale al equipo y probá de nuevo.'
+export { ApiError }
 
 async function request(path, options = {}) {
   if (!API_BASE_URL) {
@@ -50,14 +44,18 @@ async function request(path, options = {}) {
     })
   }
 
-  if (body === null) throw new ApiError(UNEXPECTED, { status: response.status })
-  return body
+  // Se devuelve también el código HTTP: cada función decide si el cuerpo (que puede ser null
+  // si no era JSON) y el código cumplen el contrato.
+  return { status: response.status, body }
 }
 
 // GET /api/professionals?service=...  ->  [ { id, name, service, ... } ]
 export async function getProfessionals(service, signal) {
+  // Solo con VITE_USE_MOCK_API=true. Si no, siempre se llama a la API real.
+  if (USE_MOCK_API) return mockApi.getProfessionals(service)
+
   const query = service ? `?service=${encodeURIComponent(service)}` : ''
-  const body = await request(`/professionals${query}`, { signal })
+  const { body } = await request(`/professionals${query}`, { signal })
   // El contrato dice que siempre es un arreglo (vacío si no hay coincidencias).
   if (!Array.isArray(body)) throw new ApiError(UNEXPECTED)
   return body
@@ -65,12 +63,17 @@ export async function getProfessionals(service, signal) {
 
 // POST /api/service-requests  ->  201 { message, data: { id, professional_id, status } }
 export async function createServiceRequest(data) {
-  const body = await request('/service-requests', {
+  // El modo demostración simula un 201 y pasa por la misma comprobación que la API real.
+  if (USE_MOCK_API) {
+    const simulated = await mockApi.createServiceRequest(data)
+    return confirmCreatedRequest(201, simulated, data.professional_id)
+  }
+
+  const { status, body } = await request('/service-requests', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(data),
   })
-  // Solo es éxito si el servidor devolvió el id de la solicitud guardada.
-  if (body?.data?.id == null) throw new ApiError(UNEXPECTED)
-  return body
+  // Solo es éxito con 201 y { data: { id, professional_id, status } } (ver contract.js).
+  return confirmCreatedRequest(status, body, data.professional_id)
 }
