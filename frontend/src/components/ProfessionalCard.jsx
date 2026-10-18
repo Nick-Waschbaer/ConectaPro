@@ -1,3 +1,17 @@
+import ServiceIcon from './ServiceIcon'
+
+// Iniciales para el avatar, sin el "(demo)" de los datos de prueba: "Marta Gómez (demo)" -> "MG".
+function initials(name) {
+  return name
+    .replace(/\(.*?\)/g, '')
+    .trim()
+    .split(/\s+/)
+    .slice(0, 2)
+    .map((word) => word[0])
+    .join('')
+    .toUpperCase()
+}
+
 // Una fila del listado. En escritorio los datos se alinean en columnas (ver index.css);
 // en móvil se apilan y cada dato muestra su etiqueta.
 export default function ProfessionalCard({ professional, onRequest }) {
@@ -7,14 +21,22 @@ export default function ProfessionalCard({ professional, onRequest }) {
   return (
     <li className="pro">
       <div className="pro-main">
-        <h3>{name}</h3>
-        {description && <p>{description}</p>}
+        <span className="avatar" aria-hidden="true">
+          {initials(name)}
+        </span>
+        <div>
+          <h3>{name}</h3>
+          {description && <p>{description}</p>}
+        </div>
       </div>
 
       <dl className="pro-facts">
         <div>
           <dt>Oficio</dt>
-          <dd>{service}</dd>
+          <dd className="pro-service">
+            <ServiceIcon service={service} size={18} />
+            {service}
+          </dd>
         </div>
         <div>
           <dt>Barrio</dt>
