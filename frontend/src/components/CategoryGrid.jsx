@@ -7,21 +7,20 @@ export default function CategoryGrid({ services, value, onChange }) {
 
   return (
     <section id="oficios" className="categories" aria-labelledby="oficios-title">
-      <h2 id="oficios-title">Oficios</h2>
+      <h2 id="oficios-title">Explorá por oficio</h2>
       <div className="category-grid">
-        <button type="button" className="category" aria-pressed={value === ''} onClick={() => onChange('')}>
-          Todos
-        </button>
-        {services.map((service) => (
+        {['', ...services].map((service) => (
           <button
-            key={service}
+            key={service || 'todos'}
             type="button"
             className="category"
             aria-pressed={value === service}
             onClick={() => onChange(service)}
           >
-            <ServiceIcon service={service} />
-            {service}
+            <span className="category-icon">
+              <ServiceIcon service={service} size={28} />
+            </span>
+            {service || 'Todos'}
           </button>
         ))}
       </div>

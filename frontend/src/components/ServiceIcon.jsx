@@ -11,10 +11,19 @@ const PATHS = {
     </>
   ),
   aire: <path d="M12 2v20M4.2 7l15.6 10M19.8 7 4.2 17" />,
+  todos: (
+    <>
+      <rect x="4" y="4" width="7" height="7" rx="1.5" />
+      <rect x="13" y="4" width="7" height="7" rx="1.5" />
+      <rect x="4" y="13" width="7" height="7" rx="1.5" />
+      <rect x="13" y="13" width="7" height="7" rx="1.5" />
+    </>
+  ),
   otro: <path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.4-.6-.6-2.4z" />,
 }
 
 function kindOf(service) {
+  if (service === '') return 'todos' // el atajo "Todos" de los oficios
   const s = service.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
   if (s.startsWith('electric')) return 'electricidad'
   if (s.startsWith('plomer')) return 'plomeria'
@@ -23,13 +32,13 @@ function kindOf(service) {
   return 'otro'
 }
 
-export default function ServiceIcon({ service }) {
+export default function ServiceIcon({ service, size = 24 }) {
   return (
     <svg
       className="service-icon"
       viewBox="0 0 24 24"
-      width="24"
-      height="24"
+      width={size}
+      height={size}
       fill="none"
       stroke="currentColor"
       strokeWidth="1.8"

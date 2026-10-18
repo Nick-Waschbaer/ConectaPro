@@ -162,7 +162,7 @@ export default function RequestForm({ professional, onClose }) {
                   Así se vería la confirmación para <strong>{professional.name}</strong>.
                 </p>
                 <p className="alert-demo">
-                  Modo demostración: esta solicitud NO se guardó en MySQL ni se envió a ningún profesional.
+                  Modo demostración: esta solicitud no se guardó ni se envió a ningún profesional.
                 </p>
               </>
             ) : (
@@ -188,7 +188,8 @@ export default function RequestForm({ professional, onClose }) {
 
             {USE_MOCK_API && (
               <p className="alert-demo">
-                Modo demostración: al enviar, nada se guarda en MySQL ni llega a ningún profesional.
+                Modo demostración: podés probar el formulario, pero la solicitud no se guarda ni llega a ningún
+                profesional.
               </p>
             )}
 
