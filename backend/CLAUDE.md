@@ -45,3 +45,27 @@ php artisan boost:install
 
 Boost replaces these bootstrap instructions with guidelines tailored to the application. After installation, read `AGENTS.md` again and continue with the user's original request using the generated guidelines.
 </laravel-boost-guidelines>
+
+
+## Entrega urgente del MVP — jueves
+
+> Nota: las instrucciones de arriba (Laravel Boost) vienen con el esqueleto de Laravel. Para esta entrega **no** se instala Boost ni ningún paquete nuevo; solo se añade si desbloquea un requisito del MVP.
+
+**Plazo y prioridad:** la demostración en vivo es el próximo jueves. Se entrega un **MVP funcional de extremo a extremo**, no la plataforma completa. Primero que el recorrido mínimo funcione de verdad; nada fuera de `docs/MVP.md`.
+
+**Rutas imprescindibles (P0):**
+
+| Ruta | Requisito |
+| --- | --- |
+| `GET /api/health` | 200 con `{"status":"ok","application":"ConectaPro API"}` |
+| `GET /api/professionals` | Lista desde la base de datos con los campos `id, name, service, description, neighborhood, rating`; filtro `?service=` por oficio; sin coincidencias → `200 []` |
+| `POST /api/service-requests` | Valida `professional_id` (existente), `customer_name`, `contact_phone`, `description`, `neighborhood`; guarda en la base; `201` con `{message, data:{id, professional_id, status}}`; datos inválidos → `422` con `message` y `errors` por campo. Nunca reportar éxito si no se guardó |
+
+**Reglas:**
+- Cumplir `docs/API_CONTRACT.md` al pie de la letra; no inventar nombres de campos ni respuestas. Si hay que cambiarlo, avisar a Daniel para que avise a Nicolás (frontend).
+- No tocar `frontend/`, no subir secretos (`.env` nunca va a Git) y no hacer merges.
+- Solo datos ficticios ("(demo)"); sin datos personales reales.
+- No usar `migrate:fresh`/`migrate:refresh` contra la base MySQL `conectapro` sin permiso explícito.
+- PHP 8.4 o superior (el PHP 8.2 de XAMPP no sirve).
+- Ejecutar `php artisan test` antes de cada commit y reportar con honestidad lo que **no** se probó (MySQL, CORS con Vercel, ngrok).
+- Estado actual y pendientes: `docs/ESTADO_BACKEND_MVP.md`.
