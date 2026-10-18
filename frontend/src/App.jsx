@@ -1,20 +1,14 @@
 import { useEffect, useState } from 'react'
 import { USE_MOCK_API } from './config'
 import { getProfessionals } from './services/api'
-import SearchPanel from './components/SearchPanel'
-import CategoryGrid from './components/CategoryGrid'
+import ServiceFilter from './components/ServiceFilter'
 import ProfessionalCard from './components/ProfessionalCard'
 import RequestForm from './components/RequestForm'
-import HeroIllustration from './components/HeroIllustration'
-
-const unique = (values) => [...new Set(values)].sort((a, b) => a.localeCompare(b, 'es'))
 
 export default function App() {
-  const [service, setService] = useState('') // oficio elegido ('' = todos); lo filtra la API
-  const [neighborhood, setNeighborhood] = useState('') // barrio elegido; se filtra aquí, sobre la lista recibida
+  const [service, setService] = useState('') // oficio elegido ('' = todos)
   const [reloadKey, setReloadKey] = useState(0) // sube cuando se pulsa "Reintentar"
-  const [services, setServices] = useState([]) // oficios vistos, para las opciones de búsqueda
-  const [neighborhoods, setNeighborhoods] = useState([]) // barrios vistos
+  const [services, setServices] = useState([]) // oficios vistos, para los botones del filtro
   const [selected, setSelected] = useState(null) // profesional elegido para el formulario
   // Guardamos el resultado junto con la petición a la que pertenece (key).
   const [result, setResult] = useState({ key: null, list: [], error: '' })
@@ -31,9 +25,8 @@ export default function App() {
       .then((list) => {
         if (cancelled) return
         setResult({ key: requestKey, list, error: '' })
-        // Se acumulan oficios y barrios para que las opciones no desaparezcan al filtrar.
-        setServices((prev) => unique([...prev, ...list.map((p) => p.service)]))
-        setNeighborhoods((prev) => unique([...prev, ...list.map((p) => p.neighborhood).filter(Boolean)]))
+        // Se acumulan los oficios para que los botones no desaparezcan al filtrar.
+        setServices((prev) => [...new Set([...prev, ...list.map((p) => p.service)])].sort())
       })
       .catch((err) => {
         if (!cancelled) setResult({ key: requestKey, list: [], error: err.message })
@@ -46,159 +39,81 @@ export default function App() {
     }
   }, [service, requestKey])
 
-  const { error } = result
-  const list = neighborhood ? result.list.filter((p) => p.neighborhood === neighborhood) : result.list
-  const filtered = Boolean(service || neighborhood)
-  const showSearch = services.length > 0 || loading
-
-  // Si los resultados quedan debajo de la mitad de la pantalla (el encabezado y los oficios están
-  // antes), se baja hasta ellos. Si ya se ven, no se mueve nada.
-  function showResults() {
-    const results = document.getElementById('profesionales')
-    if (!results || results.getBoundingClientRect().top < window.innerHeight * 0.5) return
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    results.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth' })
-  }
-
-  function handleSearch(next) {
-    setService(next.service)
-    setNeighborhood(next.neighborhood)
-    showResults()
-  }
-
-  function handleCategory(next) {
-    setService(next)
-    showResults()
-  }
-
-  function clearFilters() {
-    setService('')
-    setNeighborhood('')
-  }
-
-  // Frase para el título de resultados, por ejemplo "de Plomería en Sajonia".
-  const context = [service && `de ${service}`, neighborhood && `en ${neighborhood}`].filter(Boolean).join(' ')
+  const { list, error } = result
 
   return (
     <>
-      <a className="skip-link" href="#contenido">
-        Ir al contenido
-      </a>
-
-      <header className="topbar">
-        <div className="container topbar-inner">
+      <header className="band">
+        <div className="container">
           <p className="brand">
             <span className="brand-mark" aria-hidden="true">C</span> ConectaPro
           </p>
-          <nav aria-label="Principal">
-            {/* La sección de oficios solo existe cuando la API devolvió oficios: sin ella, no hay enlace.
-                La de profesionales siempre está (con resultados, vacía o con el error y "Reintentar"). */}
-            {services.length > 0 && <a href="#oficios">Oficios</a>}
-            <a href="#profesionales">Profesionales</a>
-          </nav>
+          <h1>Profesionales del hogar en Asunción</h1>
+          <ServiceFilter services={services} value={service} onChange={setService} disabled={loading} />
         </div>
       </header>
 
       {USE_MOCK_API && (
         <div className="demo-banner" role="status">
           <div className="container">
-            <strong>Modo demostración.</strong> Los profesionales son ficticios y las solicitudes no se guardan
-            ni se envían a nadie.
+            <strong>Modo demostración:</strong> estos profesionales son ficticios y las solicitudes no se guardan
+            en MySQL ni se envían a ningún profesional.
           </div>
         </div>
       )}
 
-      <main id="contenido" tabIndex={-1}>
-        <section className="hero" aria-labelledby="hero-title">
-          <div className="container hero-inner">
-            <div className="hero-copy">
-              <h1 id="hero-title">Profesionales del hogar en tu barrio de Asunción</h1>
-              <p className="hero-sub">Elegí un oficio y un barrio, compará valoraciones y pedí tu servicio.</p>
+      <main className="container">
+        <div aria-live="polite">
+          {loading && (
+            <ul className="list" aria-label="Cargando profesionales" aria-busy="true">
+              {[1, 2, 3].map((n) => (
+                <li className="pro skeleton" key={n} aria-hidden="true" />
+              ))}
+            </ul>
+          )}
 
-              {showSearch && (
-                <SearchPanel
-                  key={`${service}|${neighborhood}|${services.length}|${neighborhoods.length}`}
-                  services={services}
-                  neighborhoods={neighborhoods}
-                  service={service}
-                  neighborhood={neighborhood}
-                  onSearch={handleSearch}
-                />
+          {!loading && error && (
+            <div className="state state-error" role="alert">
+              <h2>No pudimos cargar los profesionales</h2>
+              <p>{error}</p>
+              <button type="button" className="btn btn-primary" onClick={() => setReloadKey((k) => k + 1)}>
+                Reintentar
+              </button>
+            </div>
+          )}
+
+          {!loading && !error && list.length === 0 && (
+            <div className="state">
+              <h2>{service ? `No hay profesionales de ${service} por ahora` : 'Todavía no hay profesionales'}</h2>
+              <p>{service ? 'Probá con otro oficio.' : 'Volvé a intentar más tarde.'}</p>
+              {service && (
+                <button type="button" className="btn btn-secondary" onClick={() => setService('')}>
+                  Ver todos
+                </button>
               )}
             </div>
-            <HeroIllustration />
-          </div>
-        </section>
+          )}
 
-        <div className="container">
-          <CategoryGrid services={services} value={service} onChange={handleCategory} />
-
-          <section id="profesionales" className="results" aria-labelledby="results-title">
-            <div aria-live="polite">
-              {loading && (
-                <>
-                  <h2 id="results-title">Profesionales</h2>
-                  <ul className="list" aria-label="Cargando profesionales" aria-busy="true">
-                    {[1, 2, 3].map((n) => (
-                      <li className="pro skeleton" key={n} aria-hidden="true" />
-                    ))}
-                  </ul>
-                </>
-              )}
-
-              {!loading && error && (
-                <div className="state state-error" role="alert">
-                  <h2 id="results-title">No pudimos cargar los profesionales</h2>
-                  <p>{error}</p>
-                  <button type="button" className="btn btn-primary" onClick={() => setReloadKey((k) => k + 1)}>
-                    Reintentar
-                  </button>
-                </div>
-              )}
-
-              {!loading && !error && list.length === 0 && (
-                <div className="state">
-                  <h2 id="results-title">
-                    {filtered ? `No hay profesionales ${context} por ahora` : 'Todavía no hay profesionales'}
-                  </h2>
-                  <p>{filtered ? 'Probá con otro oficio o con otro barrio.' : 'Volvé a intentar más tarde.'}</p>
-                  {filtered && (
-                    <button type="button" className="btn btn-secondary" onClick={clearFilters}>
-                      Ver todos
-                    </button>
-                  )}
-                </div>
-              )}
-
-              {!loading && !error && list.length > 0 && (
-                <>
-                  <div className="results-head">
-                    <h2 id="results-title">
-                      {list.length} {list.length === 1 ? 'profesional' : 'profesionales'}
-                      {context && ` ${context}`}
-                    </h2>
-                    {filtered && (
-                      <button type="button" className="btn-link" onClick={clearFilters}>
-                        Quitar filtros
-                      </button>
-                    )}
-                  </div>
-                  <div className="list-head" aria-hidden="true">
-                    <span>Profesional</span>
-                    <span>Oficio</span>
-                    <span>Barrio</span>
-                    <span>Valoración</span>
-                    <span />
-                  </div>
-                  <ul className="list" aria-label="Profesionales">
-                    {list.map((p) => (
-                      <ProfessionalCard key={p.id} professional={p} onRequest={setSelected} />
-                    ))}
-                  </ul>
-                </>
-              )}
-            </div>
-          </section>
+          {!loading && !error && list.length > 0 && (
+            <>
+              <p className="count">
+                {list.length} {list.length === 1 ? 'profesional' : 'profesionales'}
+                {service && ` de ${service}`}
+              </p>
+              <div className="list-head" aria-hidden="true">
+                <span>Profesional</span>
+                <span>Oficio</span>
+                <span>Barrio</span>
+                <span>Valoración</span>
+                <span />
+              </div>
+              <ul className="list" aria-label="Profesionales">
+                {list.map((p) => (
+                  <ProfessionalCard key={p.id} professional={p} onRequest={setSelected} />
+                ))}
+              </ul>
+            </>
+          )}
         </div>
       </main>
 
