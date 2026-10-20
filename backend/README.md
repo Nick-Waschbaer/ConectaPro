@@ -34,7 +34,7 @@ php artisan migrate --seed
 ```
 
 - `migrate` crea las tablas y es seguro repetirlo: solo ejecuta las migraciones pendientes.
-- `--seed` carga 6 profesionales ficticios ("(demo)"). Repetirlo no duplica datos (usa `updateOrCreate`).
+- `--seed` carga 100 profesionales ficticios (7 oficios y 10 barrios, con todas las combinaciones de oficio y barrio cubiertas; los nombres son inventados). Repetirlo no duplica datos (usa `updateOrCreate` por nombre). Si tu base tenía los 6 profesionales antiguos con "(demo)" en el nombre, el seeder les quita ese sufijo conservando sus IDs, así que las solicitudes ya guardadas siguen vinculadas.
 - Solo cargar los profesionales: `php artisan db:seed`.
 - **Nunca** uses `migrate:fresh` ni `migrate:refresh` salvo que quieras borrar todos los datos.
 

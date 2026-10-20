@@ -29,7 +29,7 @@ Ejecutadas con `php artisan serve` leyendo el `.env` local (`DB_CONNECTION=mysql
 | --- | --- | --- | --- |
 | Laravel conecta a MySQL | verificado | `config('database.default')` → `mysql`; `migrate:status` lee la base | Repetir en la laptop de la demo |
 | Migraciones aplicadas | verificado | 5 migraciones `Ran`; repetir `migrate --seed` no cambió los conteos | Ninguna |
-| Profesionales ficticios | verificado | 6 profesionales "(demo)" en esa base; repetir el seeder no duplicó | Ninguna |
+| Profesionales ficticios | verificado | Ejecución del 2026-10-20: 100 profesionales ficticios sin sufijo "(demo)", con 100 nombres únicos, 7 oficios, 10 barrios y las 70 combinaciones de oficio y barrio cubiertas; repetir el seeder no duplicó (siguen 100); las solicitudes ya guardadas siguen vinculadas a su profesional | Ninguna |
 | `GET /api/health` | verificado | 200 `{"status":"ok","application":"ConectaPro API"}` | Ninguna |
 | `GET /api/professionals` | verificado | 200 con las claves `id,name,service,description,neighborhood,rating` | Ninguna |
 | Filtro `?service=` | verificado | `?service=Plomería` devolvió solo profesionales de Plomería; `?service=Zzz` devolvió `[]` con 200 | Confirmar con Nicolás los nombres exactos de oficio |
@@ -70,6 +70,7 @@ Fuera del alcance del MVP (`docs/MVP.md`): autenticación, pagos, reseñas reale
 - Contrato vs. código: sin contradicciones graves; solo las dos desviaciones permitidas de la sección 2.
 - Autenticación: fuera de alcance del MVP según `docs/MVP.md`; no se implementó.
 - `rating` es un dato ficticio de demo; ningún profesional se presenta como verificado.
+- Datos de ejemplo: los 100 profesionales son inventados (pueden coincidir por casualidad con personas reales), sin teléfonos ni direcciones; los ratings son ficticios. Los oficios actuales son Electricidad, Plomería, Pintura, Aire acondicionado, Carpintería, Cerrajería y Jardinería, y hay 10 barrios de Asunción. El frontend los toma de la API, por lo que no necesita cambios.
 - `.env.example` trae `APP_DEBUG=false`. Con `true`, un error o un 404 puede mostrar rutas internas del servidor y datos de conexión en el JSON. Como la API es pública por ngrok, el `.env` debe tener **una sola línea** `APP_DEBUG=false`: si hay dos líneas duplicadas, Laravel usa la última y borrar la equivocada podría reactivar el modo de depuración.
 - `php artisan db:show` falla en XAMPP porque su `performance_schema` está incompleto. No es un problema de conexión; usar `php artisan migrate:status` para comprobarla.
 - El PHP de XAMPP (8.2) **no sirve**: las dependencias exigen PHP ≥ 8.4.1 y fallan en `vendor/autoload.php`. Usar el PHP de Herd; comprobar con `php -v`.

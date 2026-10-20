@@ -64,7 +64,7 @@ Boost replaces these bootstrap instructions with guidelines tailored to the appl
 **Reglas:**
 - Cumplir `docs/API_CONTRACT.md` al pie de la letra; no inventar nombres de campos ni respuestas. Si hay que cambiarlo, avisar a Daniel para que avise a Nicolás (frontend).
 - No tocar `frontend/`, no subir secretos (`.env` nunca va a Git) y no hacer merges.
-- Solo datos ficticios ("(demo)"); sin datos personales reales.
+- Solo datos ficticios (nombres inventados; sin teléfonos ni direcciones reales). Un profesional ficticio nunca se presenta como verificado.
 - No usar `migrate:fresh`/`migrate:refresh` contra la base MySQL `conectapro` sin permiso explícito.
 - PHP 8.4 o superior (el PHP 8.2 de XAMPP no sirve).
 - Ejecutar `php artisan test` antes de cada commit y reportar con honestidad lo que **no** se probó (MySQL, CORS con Vercel, ngrok).
