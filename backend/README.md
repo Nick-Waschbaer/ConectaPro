@@ -87,7 +87,7 @@ El frontend se publica en Vercel y esta API, que corre en la laptop, se expone a
 2. En otra terminal abre el túnel solo hacia el puerto de Laravel: `ngrok http 8000`. Copia la dirección `https://…` que muestra.
 3. Comprueba desde otro dispositivo que `<esa dirección>/api/health` devuelve `{"status":"ok","application":"ConectaPro API"}`.
 4. Pásale a Nicolás esa dirección **terminada en `/api`**: es el valor de `VITE_API_BASE_URL` en Vercel y hay que volver a desplegar el frontend.
-5. Nicolás te pasa la dirección exacta de Vercel que se usará en la demostración. Agrégala (sin quitar las anteriores y sin `/` final) en `CORS_ALLOWED_ORIGINS` del `.env` y reinicia `php artisan serve`:
+5. El origen que debe permitir el CORS es el de la **demo oficial**, la *Preview* de Vercel indicada en [`../docs/ESTADO_BACKEND_MVP.md`](../docs/ESTADO_BACKEND_MVP.md#57-url-oficial-de-la-demostración) (sección 5.7); **no** el dominio de producción. Si no está ya, agrégalo (sin quitar los anteriores y sin `/` final) en `CORS_ALLOWED_ORIGINS` del `.env` y reinicia `php artisan serve`:
 
    ```env
    CORS_ALLOWED_ORIGINS=http://localhost:5173,http://127.0.0.1:5173,https://LA-DIRECCION-DE-VERCEL
