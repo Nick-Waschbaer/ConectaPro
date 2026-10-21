@@ -59,7 +59,7 @@ Con Laravel, MySQL y ngrok encendidos en la laptop de Daniel. La URL del túnel 
 
 | Tema | Estado | Detalle | Siguiente acción |
 | --- | --- | --- | --- |
-| Dominio de Vercel en CORS | funciona hoy, con un riesgo | El dominio configurado puede ser una dirección de **rama** (preview), distinta del dominio de producción. Si se usa otra dirección en la presentación, no estará permitida y el navegador bloqueará las peticiones (error de CORS) | Nicolás confirma la dirección final; Daniel la **agrega** (sin quitar la actual) en `CORS_ALLOWED_ORIGINS` y reinicia `php artisan serve` |
+| Dominio de Vercel en CORS | funciona hoy, con un riesgo | El dominio configurado puede ser una dirección de **rama** (preview), distinta del dominio de producción. Si se usa otra dirección en la presentación, no estará permitida y el navegador bloqueará las peticiones (error de CORS) | La dirección oficial de la demostración es la Preview indicada en la sección 5.7. Si no estuviera ya permitida, Daniel la **agrega** (sin quitar las actuales) en `CORS_ALLOWED_ORIGINS` y reinicia `php artisan serve` |
 | URL de ngrok estable | pendiente de cuidar | La URL gratuita cambia al reiniciar ngrok; Vercel apuntaría a una URL muerta hasta que Nicolás actualice `VITE_API_BASE_URL` y redespliegue | Mantener ngrok abierto durante la demo |
 | Laptop como servidor | riesgo | MySQL, `php artisan serve` y ngrok deben seguir encendidos y la laptop no debe suspenderse | Desactivar la suspensión; dejar la laptop enchufada |
 | Datos de prueba en la base | pendiente | La tabla `service_requests` contiene solicitudes de prueba | Limpiarla antes de la demo con un `DELETE` dirigido y permiso explícito de Daniel (nunca `migrate:fresh`) |
@@ -99,7 +99,7 @@ Revisión de **solo lectura** sobre la rama `main` (commit `b08d1ac`, igual al `
 Ver también la sección 4. Antes de cada demostración conviene confirmar:
 
 - **URL de ngrok:** la gratuita cambia al reiniciar el túnel; `VITE_API_BASE_URL` en Vercel debe apuntar a la actual, terminada en `/api` y con HTTPS, y hay que volver a desplegar el frontend tras cambiarla.
-- **CORS:** `CORS_ALLOWED_ORIGINS` del `.env` del backend debe incluir la dirección exacta de Vercel que se usará (puede ser distinta de la de una rama de previsualización). Si falta, el navegador bloquea las llamadas.
+- **CORS:** `CORS_ALLOWED_ORIGINS` del `.env` del backend debe incluir el origen exacto de la demostración oficial, indicado en la sección 5.7 (no el dominio de producción). Si falta, el navegador bloquea las llamadas.
 - **`VITE_USE_MOCK_API`:** en Vercel debe estar ausente o en `false`; con `true` el sitio mostraría datos ficticios del modo demo.
 - **Configuración del proyecto en Vercel** (directorio raíz `frontend`, comando de compilación, directorio de salida): no hay `vercel.json` en el repositorio, así que no puede comprobarse desde aquí.
 - **Laptop del backend:** MySQL, `php artisan serve` y ngrok encendidos, y sin suspensión.
@@ -114,9 +114,28 @@ Ver también la sección 4. Antes de cada demostración conviene confirmar:
 
 ### 5.6 Incertidumbres abiertas
 
-- Qué rama despliega Vercel, cuál es el dominio final de la demostración y si el `.env` real de Daniel lo permite en CORS.
+- La dirección oficial de la demostración ya está definida (sección 5.7). Desde el repositorio no se puede comprobar la configuración de Vercel ni el `.env` real de Daniel; el equipo confirma que el envío de solicitudes funciona desde esa dirección, pero este documento no registra por separado el origen exacto que permite el CORS.
+- No se comprobó si la dirección de la Preview seguiría disponible si se borrara la rama que la genera.
 - El contenido de los issues #7 y #16: el repositorio no lo incluye.
 - Los documentos `IDEA_PROYECTO_CONECTAPRO.md`, `PRD_01_Frontend_ConectaPro.md` y `PRD_02_Backend_ConectaPro.md` no existen en el repositorio; la visión resumida está en `docs/PROYECTO.md`.
+
+### 5.7 URL oficial de la demostración
+
+**Dirección oficial de la demostración escolar:** <https://conecta-pro-git-feat-frontend-angi-redesign-goldbaeren.vercel.app>
+
+- **Es una Preview de Vercel**: la que Vercel genera para la rama `feat/frontend-angi-redesign`. Su frontend es el código de esa rama, que **ya está integrado en `main`**: el contenido de `frontend/` es el mismo.
+- **No debe confundirse con el dominio de producción**, `https://conecta-pro-psi.vercel.app`. El 2026-10-20 ese dominio **no tenía configurada la URL de la API** y mostraba «Falta configurar VITE_API_BASE_URL». Esa observación no se corrigió y este documento **no afirma que esté reparado**. Esa dirección no se usa para la demostración. El enlace «Website» del repositorio en GitHub apuntaba entonces a ese dominio de producción.
+- **Cómo se mantiene:** Vercel reconstruye la Preview cuando se sube un commit a esa rama, así que no conviene hacer push a ella ni borrarla antes de la exposición.
+- **La API detrás de la Preview es un túnel de ngrok y su dirección cambia.** No se escribe aquí porque no es permanente. Si el túnel se reinicia, hay que actualizar `VITE_API_BASE_URL` en Vercel para ese entorno y volver a desplegar (ver 5.4).
+- **CORS:** el backend debe permitir el origen exacto de la Preview, sin `/` al final, en `CORS_ALLOWED_ORIGINS` (ver [`../backend/README.md`](../backend/README.md)).
+
+Tipos de evidencia sobre la Preview:
+
+| Evidencia | Qué abarca |
+| --- | --- |
+| **Confirmada por el equipo** (pruebas funcionales; no se repitieron en la revisión) | La Preview abre y muestra los profesionales, el backend está operativo, los filtros y el envío de solicitudes funcionan y las solicitudes válidas se guardan en MySQL |
+| **Comprobada de solo lectura el 2026-10-20** (sin enviar solicitudes) | Responde con HTTP 200 sin pedir inicio de sesión de Vercel; Vercel marca como exitoso el despliegue del último commit de la rama (`f27e2cf`); el código publicado coincide con el de `main` compilado, salvo la URL de la API; esa URL está definida, es HTTPS y termina en `/api`; el código publicado no contiene datos ni avisos del modo demo; al cargarla en un navegador aparecieron 100 profesionales, 7 oficios y 10 barrios traídos de la API en ese momento |
+| **No verificada** | El envío (`POST`) y su CORS desde esa dirección en la revisión, MySQL, las pruebas de PHPUnit, y que el túnel y la laptop del backend sigan encendidos el día de la exposición |
 
 ## Contradicciones y notas
 

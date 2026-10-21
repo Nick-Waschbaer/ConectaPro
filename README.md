@@ -4,6 +4,8 @@ Marketplace web que conecta a clientes con profesionales independientes de servi
 
 > **Entrega escolar:** este repositorio contiene un **MVP funcional y demostrable**, no la plataforma completa. Los profesionales y las solicitudes son datos de prueba. Aquí se distingue siempre entre lo **implementado**, lo **verificado** y lo **planificado para futuras fases**.
 
+> **Demo oficial:** [https://conecta-pro-git-feat-frontend-angi-redesign-goldbaeren.vercel.app](https://conecta-pro-git-feat-frontend-angi-redesign-goldbaeren.vercel.app) — es una *Preview* de Vercel y es la dirección que debe usarse. **No uses el dominio de producción** (`conecta-pro-psi.vercel.app`): el 2026-10-20 no estaba configurado para conectarse a la API. Qué se comprobó y qué no, y qué puede cambiar, está en [`docs/ESTADO_BACKEND_MVP.md`](docs/ESTADO_BACKEND_MVP.md#57-url-oficial-de-la-demostración). Para que la demo muestre profesionales, el backend (Laravel, MySQL y el túnel de ngrok) debe estar encendido en el equipo de Daniel.
+
 ## Qué es ConectaPro
 
 Una persona que necesita un técnico o un servicio de mantenimiento (electricidad, plomería, pintura, etc.) puede buscar profesionales de su zona, compararlos y enviarles una solicitud de servicio. La idea completa del producto (la visión) está resumida en [`docs/PROYECTO.md`](docs/PROYECTO.md); lo que se construyó para esta entrega está acotado en [`docs/MVP.md`](docs/MVP.md).
@@ -94,6 +96,7 @@ Con el backend encendido, `VITE_API_BASE_URL` debe apuntar a `http://127.0.0.1:8
 
 - **Pruebas automatizadas:** el frontend tiene 8 pruebas (`npm test`) que comprueban el contrato de la respuesta y el modo demo; **no llaman al backend real**. El backend tiene 13 pruebas (`php artisan test`) sobre rutas, validación y CORS; usan SQLite en memoria.
 - **Integración real:** el recorrido (listar, filtrar, enviar una solicitud y guardarla en MySQL, a través de Vercel y ngrok) fue **probado de forma manual por el equipo** y está registrado, junto con su tipo de evidencia, en [`docs/ESTADO_BACKEND_MVP.md`](docs/ESTADO_BACKEND_MVP.md). No es una prueba automatizada.
+- **Demo oficial:** la Preview de Vercel indicada arriba. El equipo confirma que muestra los profesionales y que el envío de solicitudes funciona; la revisión del 2026-10-20 comprobó además, de solo lectura, que responde y carga 100 profesionales desde la API. Detalle y límites en [`docs/ESTADO_BACKEND_MVP.md`](docs/ESTADO_BACKEND_MVP.md#57-url-oficial-de-la-demostración).
 - **Lo operativo puede cambiar:** la URL de ngrok cambia al reiniciar el túnel y el dominio de Vercel debe estar permitido en el CORS del backend. Conviene repetir una prueba completa justo antes de cada demostración.
 
 ## Reglas básicas
