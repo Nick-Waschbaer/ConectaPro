@@ -1,5 +1,7 @@
 # Tarjetas iniciales para GitHub Projects
 
+> **Documento histórico (tarjetas iniciales).** Las casillas **no se actualizaron** y no reflejan el estado actual. El seguimiento real se lleva en los issues y el tablero de GitHub (el equipo informa que los issues #7 y #16 están cerrados; su contenido no está en el repositorio). El estado técnico verificado está en [`ESTADO_BACKEND_MVP.md`](ESTADO_BACKEND_MVP.md).
+
 Crear un tablero Kanban con estados `Por hacer`, `En progreso`, `En revisión` y `Terminado`. Cada elemento siguiente puede crearse como Issue y añadirse al Project.
 
 ## Bloqueantes compartidos

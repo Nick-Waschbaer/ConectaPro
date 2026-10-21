@@ -2,6 +2,8 @@
 
 Diagnóstico basado en el repositorio y en comprobaciones ejecutadas los días 2026-10-18 y 2026-10-19 en la laptop de Daniel. Entorno: PHP 8.5.0, Laravel 13.37.0, MariaDB 10.4.32 (XAMPP), ngrok 3.39.9.
 
+La sección 5 recoge la **actualización de cierre del 2026-10-20** (revisión de solo lectura del repositorio y de la documentación): qué se comprobó entonces, qué es reporte del equipo y qué no se pudo repetir.
+
 ## Cómo leer este documento
 
 Cada requisito se clasifica según el **tipo de evidencia**. No son equivalentes:
@@ -38,7 +40,7 @@ Ejecutadas con `php artisan serve` leyendo el `.env` local (`DB_CONNECTION=mysql
 | Profesional inexistente / JSON mal formado | verificado (desviación admitida) | Responden 422. El contrato admite "404 o 422, según el caso" y el 400 "cuando corresponda" | Ninguna; el contrato no se cambió |
 | CORS desde Vite local | verificado | Preflight `OPTIONS` desde `http://localhost:5173` → 204 con `Access-Control-Allow-Origin` | Ninguna |
 | CORS rechaza orígenes no listados | verificado | Preflight desde un `*.vercel.app` no configurado → 204 **sin** `Access-Control-Allow-Origin` | Ninguna |
-| Filtro `?neighborhood=` (opcional en el contrato) | pendiente | Implementado y sin prueba propia | Añadir prueba solo si el frontend lo usa |
+| Filtro `?neighborhood=` (opcional en el contrato) | implementado, sin prueba propia | Existe en el controlador. **El frontend no lo usa**: filtra el barrio en el navegador sobre la lista recibida | Ninguna para la demo; añadir una prueba solo si algún día se usa |
 
 ## 3. Túnel ngrok y Vercel (verificado el 2026-10-19)
 
@@ -61,9 +63,60 @@ Con Laravel, MySQL y ngrok encendidos en la laptop de Daniel. La URL del túnel 
 | URL de ngrok estable | pendiente de cuidar | La URL gratuita cambia al reiniciar ngrok; Vercel apuntaría a una URL muerta hasta que Nicolás actualice `VITE_API_BASE_URL` y redespliegue | Mantener ngrok abierto durante la demo |
 | Laptop como servidor | riesgo | MySQL, `php artisan serve` y ngrok deben seguir encendidos y la laptop no debe suspenderse | Desactivar la suspensión; dejar la laptop enchufada |
 | Datos de prueba en la base | pendiente | La tabla `service_requests` contiene solicitudes de prueba | Limpiarla antes de la demo con un `DELETE` dirigido y permiso explícito de Daniel (nunca `migrate:fresh`) |
-| Filtro `?neighborhood=` | pendiente | Sin prueba propia | Solo si el frontend lo usa |
+| Filtro `?neighborhood=` | sin uso en el frontend | Sin prueba propia; el frontend no lo llama | Ninguna para la demo |
 
 Fuera del alcance del MVP (`docs/MVP.md`): autenticación, pagos, reseñas reales, y un panel para ver las solicitudes.
+
+## 5. Actualización de cierre (2026-10-20)
+
+Revisión de **solo lectura** sobre la rama `main` (commit `b08d1ac`, igual al `main` remoto en ese momento). No se ejecutaron migraciones, seeders ni peticiones `POST`, no se instalaron dependencias y no se tocó ninguna base de datos.
+
+### 5.1 Comprobado en esa revisión
+
+| Comprobación | Resultado | Alcance |
+| --- | --- | --- |
+| Frontend: `npm run lint` | sin avisos | Revisión estática del código |
+| Frontend: `npm test` | 8 pruebas pasan, 0 fallan | Solo el formato de la respuesta de éxito y el modo demo. **No usan red ni el backend** |
+| Frontend: compilación | correcta (se generó fuera del repositorio) | El código generado por defecto **no** contiene los datos ni los avisos del modo demo |
+| Rutas, campos y respuestas | coinciden entre contrato, backend y frontend | Lectura de `routes/api.php`, controladores, `StoreServiceRequestRequest` y `frontend/src/services` |
+| Reglas de validación | las del frontend repiten las de Laravel (formato de teléfono y largos máximos) | Lectura de código |
+| Datos de ejemplo | el seeder define 100 profesionales ficticios: 6 originales, 64 combinaciones de oficio y barrio sin cubrir y 30 más de variedad; 7 oficios, 10 barrios y valoraciones ficticias entre 3,8 y 5,0 | Lectura del código del seeder. **La cantidad de filas actual en MySQL es la reportada en la sección 2**, no se consultó la base |
+| Secretos y archivos locales | ningún archivo con seguimiento contiene `.env` reales, `vendor`, `node_modules`, claves ni datos personales (búsqueda de patrones sobre los archivos de Git) | Solo archivos con seguimiento. El único teléfono que aparece es el de prueba de la documentación y las pruebas |
+
+### 5.2 Verificaciones manuales del equipo (no repetidas en la revisión)
+
+- **Registradas en este documento:** MySQL local (sección 2, 2026-10-18) y túnel público con Vercel (sección 3, 2026-10-19), con su tipo de evidencia.
+- **Reportadas por el equipo el 2026-10-20 y no registradas con más detalle en el repositorio:** que se probaron públicamente los errores de validación, el CORS y el mensaje que se muestra al perder la conexión; que los issues #7 y #16 están cerrados; que ya se grabó un video de respaldo de la demostración pública (el video no está en el repositorio); y que las auditorías independientes de Codex y de Claude Code concluyeron que no hay defectos de código confirmados que justifiquen retrasar la entrega. El informe de Codex tampoco está en el repositorio.
+
+### 5.3 Pruebas que no se pudieron repetir
+
+- **`php artisan test`:** no se ejecutó porque la copia revisada no tiene instalada la carpeta `vendor/`, e instalarla estaba fuera del alcance de una revisión de solo lectura. El último resultado registrado es el de la sección 1 (13 pruebas, 0 fallos, 50 aserciones, 2026-10-18). Un recuento estático de métodos de prueba da 13 (8 de API, 4 de CORS y 1 de ejemplo), lo que coincide, pero **no equivale a ejecutarlas**.
+- **Ninguna llamada a MySQL, a ngrok ni a Vercel**, y ninguna petición `POST`. La API local no estaba encendida en la máquina de la revisión.
+- **Recorrido de punta a punta con la versión final del frontend** (portada con buscador y 100 profesionales): el equipo dice haberlo hecho, pero no hay registro verificable en el repositorio.
+
+### 5.4 Aspectos operativos que pueden cambiar
+
+Ver también la sección 4. Antes de cada demostración conviene confirmar:
+
+- **URL de ngrok:** la gratuita cambia al reiniciar el túnel; `VITE_API_BASE_URL` en Vercel debe apuntar a la actual, terminada en `/api` y con HTTPS, y hay que volver a desplegar el frontend tras cambiarla.
+- **CORS:** `CORS_ALLOWED_ORIGINS` del `.env` del backend debe incluir la dirección exacta de Vercel que se usará (puede ser distinta de la de una rama de previsualización). Si falta, el navegador bloquea las llamadas.
+- **`VITE_USE_MOCK_API`:** en Vercel debe estar ausente o en `false`; con `true` el sitio mostraría datos ficticios del modo demo.
+- **Configuración del proyecto en Vercel** (directorio raíz `frontend`, comando de compilación, directorio de salida): no hay `vercel.json` en el repositorio, así que no puede comprobarse desde aquí.
+- **Laptop del backend:** MySQL, `php artisan serve` y ngrok encendidos, y sin suspensión.
+- **Datos de prueba:** la tabla `service_requests` puede contener solicitudes de prueba; limpiarla solo con un `DELETE` dirigido y permiso explícito de Daniel (ver sección 4).
+
+### 5.5 Observaciones técnicas conocidas (no bloqueantes)
+
+- El frontend no tiene tiempo límite en las peticiones: si el túnel se queda colgado, el formulario puede quedarse en "Enviando…" hasta recargar la página.
+- `POST /api/service-requests` no tiene límite de peticiones (endpoint público sin autenticación, decisión del MVP).
+- Las pruebas de CORS no cubren la cabecera `ngrok-skip-browser-warning`, y el frontend no tiene pruebas automáticas de componentes ni de las llamadas reales.
+- Algunos mensajes de validación (por ejemplo de longitud) pueden salir en inglés; el frontend ya valida esos límites antes de enviar.
+
+### 5.6 Incertidumbres abiertas
+
+- Qué rama despliega Vercel, cuál es el dominio final de la demostración y si el `.env` real de Daniel lo permite en CORS.
+- El contenido de los issues #7 y #16: el repositorio no lo incluye.
+- Los documentos `IDEA_PROYECTO_CONECTAPRO.md`, `PRD_01_Frontend_ConectaPro.md` y `PRD_02_Backend_ConectaPro.md` no existen en el repositorio; la visión resumida está en `docs/PROYECTO.md`.
 
 ## Contradicciones y notas
 

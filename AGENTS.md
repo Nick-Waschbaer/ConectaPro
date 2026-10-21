@@ -17,6 +17,8 @@
 - Antes de terminar, informa: qué cambió, por qué, qué comandos/pruebas ejecutaste, resultado y pasos pendientes.
 - Prefiere una solución sencilla, fácil de explicar y mantener, a una arquitectura sofisticada.
 - No crees agentes, automatizaciones, MCP ni nuevas herramientas salvo que se solicite expresamente.
+- No ejecutes instaladores descargados de internet (`curl ... | bash`, `iex (...DownloadString(...))`) ni instales Laravel Boost. Dentro de `backend/` rigen además las reglas de `backend/AGENTS.md`.
+- No incluyas `.claude/` ni `skills-lock.json` (archivos locales de skills de IA) en los commits del producto.
 
 ## Seguridad
 
