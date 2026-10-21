@@ -11,6 +11,7 @@ Material para la exposición. No forma parte de la aplicación (`frontend/` y `b
 | `guion.md` | Guía para exponer (Nicolás y Daniel se alternan), sección operativa aparte y preguntas frecuentes con respuestas técnicas |
 | `assets/` | Capturas reales de la demo oficial (4 imágenes PNG de 2880×1620) |
 | `src/generar-presentacion.js` | Código que genera el `.pptx` (por si hay que rehacerlo) |
+| [`COMO_SE_HIZO.md`](COMO_SE_HIZO.md) | **Cómo se creó la presentación**: herramientas, capturas, diseño, versiones y cómo regenerarla y validarla (para aprender el proceso y mantenerla) |
 
 ## Cómo presentar
 
