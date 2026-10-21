@@ -46,6 +46,8 @@ Navegador del cliente
 
 Frontend: `VITE_API_BASE_URL` debe contener la URL base pública de la API; por ejemplo, la URL de ngrok terminada en `/api`. Las variables `VITE_*` quedan expuestas al navegador: nunca guardar secretos en ellas.
 
+Frontend, modo demostración: `VITE_USE_MOCK_API=true` sustituye la API por datos ficticios **solo para probar la interfaz sin backend**; no guarda nada. Debe estar ausente o en `false` en la demostración pública. Detalles en [`../frontend/README.md`](../frontend/README.md).
+
 Backend: `.env` contiene la configuración local de Laravel y base de datos. Nunca subirlo a GitHub. Mantener `.env.example` sin contraseñas reales.
 
 ## Desarrollo y demostración
@@ -60,3 +62,7 @@ La URL del túnel puede cambiar o estar sujeta a límites del plan gratuito. Dan
 ## CORS
 
 El backend debe permitir el origen del frontend local durante desarrollo y el dominio Vercel utilizado para la entrega. No resolver errores usando configuraciones amplias sin entender el riesgo; probar la configuración real del navegador.
+
+## Estado de implementación
+
+La arquitectura descrita arriba **está implementada**: React (frontend) llama a la API de Laravel, que valida y guarda en MySQL. Qué se probó, con qué evidencia y qué aspectos operativos pueden cambiar (URL de ngrok, CORS, variables de Vercel) está en [`ESTADO_BACKEND_MVP.md`](ESTADO_BACKEND_MVP.md); los endpoints, en [`API_CONTRACT.md`](API_CONTRACT.md).

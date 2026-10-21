@@ -19,6 +19,8 @@ Antes de implementar, lee `AGENTS.md` y los documentos relevantes de `docs/`. Es
 - No asumir que MySQL, CORS, autenticación o despliegue funcionan sin comprobarlo.
 - No añadir dependencias sin explicar para qué sirven.
 - No leer ni exponer secretos del archivo `.env`.
+- No ejecutar instaladores descargados de internet (`curl ... | bash`, `iex (...DownloadString(...))`) ni instalar Laravel Boost. En `backend/` rigen además `backend/AGENTS.md` y `backend/CLAUDE.md`.
+- No incluir `.claude/` ni `skills-lock.json` (archivos locales de skills) en los commits del producto.
 - No hacer commits, pushes, merges ni operaciones destructivas de Git sin que un humano lo pida expresamente.
 
 ## División de trabajo

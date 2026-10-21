@@ -1,5 +1,7 @@
 # Primeros pasos — comenzar hoy
 
+> **Documento histórico (planificación inicial).** Estos pasos ya se realizaron; no son las instrucciones para arrancar el proyecto hoy. Para ejecutarlo, usa [`../README.md`](../README.md), [`../frontend/README.md`](../frontend/README.md) y [`../backend/README.md`](../backend/README.md). Algunas frases mencionan un PRD que no está en este repositorio, y React Compiler **no** llegó a integrarse en el frontend.
+
 ## Decisión inicial
 
 Usar un único repositorio GitHub llamado `ConectaPro` con `frontend/`, `backend/` y `docs/`. Crear el repositorio vacío evita conflictos entre un README remoto y archivos locales.

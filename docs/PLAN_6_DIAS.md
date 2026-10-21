@@ -1,5 +1,7 @@
 # Plan de trabajo hasta la entrega
 
+> **Documento histórico (planificación inicial).** Describe el plan de trabajo que se previó, no el estado actual del proyecto. El estado real está en [`../README.md`](../README.md), en la sección «Estado de la entrega» de [`MVP.md`](MVP.md) y en [`ESTADO_BACKEND_MVP.md`](ESTADO_BACKEND_MVP.md).
+
 Ajusten el plan a la hora real de presentación. Si un objetivo se retrasa, reduzcan alcance antes de comprometer la demo.
 
 ## Día 1 — Base compartida
